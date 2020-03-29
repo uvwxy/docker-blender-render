@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 def renderAndSaveCamera ( cameraName, fileName):
     bpy.context.scene.camera = bpy.data.objects[cameraName]
     bpy.context.scene.render.filepath = './' + fileName + '-' + cameraName
-    bpy.context.scene.render.image_settings.file_format='PNG'
+    bpy.context.scene.render.image_settings.file_format='JPEG'
     bpy.ops.render.render(use_viewport=False, write_still=True)
 
 def prepareObject(selected):    

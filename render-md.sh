@@ -67,16 +67,16 @@ for CATEGORY in $(ls | sort -n); do
                 for stl in $(find ./ -iname "*.stl" | sort -n); do
                     STL=$(basename $stl .stl)
                     echo "{% include preview-stl.html \
-                     src=\"stl/$CATEGORY/$PROJECT/$STL-diagonal-sm.png\" \
-                     lg=\"stl/$CATEGORY/$PROJECT/$STL-diagonal.png\" \
+                     src=\"stl/$CATEGORY/$PROJECT/$STL-diagonal-sm.jpg\" \
+                     lg=\"stl/$CATEGORY/$PROJECT/$STL-diagonal.jpg\" \
                      href=\"stl/$CATEGORY/$PROJECT/$STL.stl\" \
                      blend=\"stl/$CATEGORY/$PROJECT/$B.blend\"
                      title=\"$STL.stl\" %}" >> ../../$mdFile
 
                     CDIR=$(pwd);
                     taretDir=$CATEGORY/$PROJECT/
-                    stlFile=$taretDir/$stl
-                    previewFile=$STL-diagonal.png
+                    stlFile=$stl
+                    previewFile=$STL-diagonal.jpg
                     cd ../../
                     bash /opt/render/render-stl.sh $taretDir $stlFile $previewFile $mdFile
                     cd $CDIR
