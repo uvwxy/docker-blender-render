@@ -2,7 +2,7 @@
 
 cd /opt/render/files
 
-DEFAULT_DATE="2020-01-01"
+DEFAULT_DATE=$(date "+%Y-%m-%d")
 
 for CATEGORY in $(ls | sort -n); do
     if [ -d $CATEGORY ]; then
@@ -17,6 +17,10 @@ for CATEGORY in $(ls | sort -n); do
                  # find the blend file
                 B=$(basename *.blend .blend)
                 previewFile=""
+                PREVIEWS_FILE="thing.previews"
+                PREVIEW_FILE="thing.preview"
+
+                echo "" > $PREVIEWS_FILE
 
                 for stl in $(find ./ -iname "*.stl" | sort -n); do
                     STL=$(basename $stl .stl)
@@ -24,6 +28,12 @@ for CATEGORY in $(ls | sort -n); do
                     taretDir=$CATEGORY/$PROJECT/
                     stlFile=$stl
                     previewFile=$STL-diagonal.jpg
+                    echo "{% include preview-stl.html \
+                        src=\"/things/$CATEGORY/$PROJECT/$STL-diagonal-sm.jpg\" \
+                        lg=\"/things/$CATEGORY/$PROJECT/$STL-diagonal.jpg\" \
+                        href=\"/things/$CATEGORY/$PROJECT/$STL.stl\" \
+                        blend=\"/things/$CATEGORY/$PROJECT/$B.blend\"
+                        title=\"$STL.stl\" %}" >> $PREVIEWS_FILE
                     cd ../../
                     bash /opt/render/render-stl.sh $taretDir $stlFile $previewFile
                     cd $CDIR
@@ -34,11 +44,13 @@ for CATEGORY in $(ls | sort -n); do
                 then
                     echo $DEFAULT_DATE > $DATE_FILE
                 fi
-                MD_FILE="$(cat thing.date)-thing.md"
+                MD_FILE="$(cat thing.date)-$PROJECT.md"
                 TITLE_FILE="thing.title"
                 DESCR_FILE="thing.descr"
                 DESCRIPTION_FILE="thing.description"
                 
+                # create defaults
+
                 if [ ! -f $TITLE_FILE ];
                 then
                     echo "$PROJECT" > $TITLE_FILE
@@ -48,8 +60,16 @@ for CATEGORY in $(ls | sort -n); do
                 then
                     echo "Yet another STL file." > $DESCR_FILE
                 fi
-                
-                rm *-thing.md
+
+                if [ ! -f $DESCRIPTION_FILE ];
+                then
+                    echo "This thing has no description." > $DESCRIPTION_FILE
+                fi
+
+                if [ ! -f $PREVIEW_FILE ];
+                then
+                    echo "$previewFile" > $PREVIEW_FILE
+                fi
 
                 echo "---" > $MD_FILE
                 echo "category: thing" >> $MD_FILE
@@ -57,13 +77,15 @@ for CATEGORY in $(ls | sort -n); do
                 echo "title: $(tail $TITLE_FILE)" >> $MD_FILE
                 echo "layout: post" >> $MD_FILE
                 echo "description: $(tail $DESCR_FILE)" >> $MD_FILE
-                echo "previewPath: /$CATEGORY/$PROJECT/$previewFile" >> $MD_FILE
+                echo "previewPath: /things/$CATEGORY/$PROJECT/$(tail $PREVIEW_FILE)" >> $MD_FILE
                 echo "---" >> $MD_FILE
-                if [ -f $DESCRIPTION_FILE ];
-                then
-                    cat $DESCRIPTION_FILE >> $MD_FILE
-                fi
-
+                echo "#### STL files" >> $MD_FILE
+                cat $PREVIEWS_FILE >> $MD_FILE
+                echo "#### Source file" >> $MD_FILE
+                echo "[$B.blend](/things/$CATEGORY/$PROJECT/$B.blend)" >> $MD_FILE
+                echo "<br/><br/>You can edit this with Blender. Get Bender here: [https://blender.org](https://blender.org)" >> $MD_FILE
+                echo "#### Description" >> $MD_FILE
+                cat $DESCRIPTION_FILE >> $MD_FILE
                 cd ..
             fi
         done
