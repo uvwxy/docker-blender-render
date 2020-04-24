@@ -1,7 +1,7 @@
 # Docker Blender STL Render
 
-My forganization of `.stl` and `.blend` files is the following.
-I have a folder called `stl/`, with the following content structure:
+My organization of `.stl` and `.blend` files is the following.
+I have a folder called `things/`, with the following content structure:
 
 ```
 categoryX/
@@ -24,7 +24,21 @@ categoryY/
 
 Which means, each project is in a category, and has a single blender source file `.blend` and multiple resulting `.stl` files.
 
-I use the following docker container to render the `.stl` files to `.png` previews, and a Markdown file for description, which I embedd in my blog via Jekyll.
+I use the following docker container to render the `.stl` files to `.png` previews, and a Markdown file for Jekyll for each project, which I then embedd in my blog via Jekyll.
+
+For each project the following files are initialized:
+
+- `thing.date`: todays date
+- `thing.descr`: "Yet another STL file."
+- `thing.description`: "This thing has no description."
+- `thing.preview`: the last preview image file name (*.jpg)
+- `thing.title`: taken from the parent directory
+
+... and the following file is overwritten every time:
+
+- `thing.previews`: the jekyll template generated to display stl previews, see **_include/preview-stl.html
+
+You can modify the `thing.*` to change the respective values when re-running the container across your files/folders.
 
 ## Setup
 
