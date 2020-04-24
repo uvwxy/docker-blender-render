@@ -1,2 +1,4 @@
 blender-2.82a-linux64.tar.xz
-*.blend1
+*.blend1test/
+render-20x20.blend1
+test/

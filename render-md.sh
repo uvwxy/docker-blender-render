@@ -2,53 +2,10 @@
 
 cd /opt/render/files
 
-mdFile="./stl.md"
+DEFAULT_DATE="2020-01-01"
 
-echo "---" > $mdFile
-echo "title: STLs" >> $mdFile
-echo "layout: post" >> $mdFile
-echo "---" >> $mdFile
-
-# index
-echo "## Index" >> $mdFile
-
-# create index
 for CATEGORY in $(ls | sort -n); do
     if [ -d $CATEGORY ]; then
-        echo "$CATEGORY"
-        echo "- [$CATEGORY](#$CATEGORY)" >> $mdFile
-
-        cd $CATEGORY
-        for PROJECT in $(ls | sort -n); do
-            if [ -d $PROJECT ];
-            then
-                echo "    $PROJECT"
-                cd $PROJECT
-
-                # find the blend file
-                B=$(basename *.blend .blend)
-                echo "    - [$PROJECT](#$PROJECT)" >> ../../$mdFile
-
-                cd ..
-            fi
-        done
-        cd ..
-    fi
-done
-
-# intro text
-echo "" >> $mdFile
-echo "Click on any image for a larger view. Click on the image title to download the STL file." >> $mdFile
-
-echo "## Files" >> $mdFile
-
-
-
-# create body
-for CATEGORY in $(ls | sort -n); do
-    if [ -d $CATEGORY ]; then
-        echo "<br/>" >> $mdFile
-        echo "## <a name=\"$CATEGORY\"></a> $CATEGORY" >> $mdFile
 
         cd $CATEGORY
         for PROJECT in $(ls | sort -n); do
@@ -59,28 +16,54 @@ for CATEGORY in $(ls | sort -n); do
 
                  # find the blend file
                 B=$(basename *.blend .blend)
-                #echo "#### <a name=\"$PROJECT\"></a> $PROJECT" >> ../../$mdFile
-    #echo "Source File: [$B.blend](stl/$CATEGORY/$PROJECT/$B.blend)" >> ../../$mdFile
+                previewFile=""
 
-                echo "<hr/><br/>" >> ../../$mdFile
-                echo "#### <a name=\"$PROJECT\"></a> $PROJECT" >> ../../$mdFile
                 for stl in $(find ./ -iname "*.stl" | sort -n); do
                     STL=$(basename $stl .stl)
-                    echo "{% include preview-stl.html \
-                     src=\"stl/$CATEGORY/$PROJECT/$STL-diagonal-sm.jpg\" \
-                     lg=\"stl/$CATEGORY/$PROJECT/$STL-diagonal.jpg\" \
-                     href=\"stl/$CATEGORY/$PROJECT/$STL.stl\" \
-                     blend=\"stl/$CATEGORY/$PROJECT/$B.blend\"
-                     title=\"$STL.stl\" %}" >> ../../$mdFile
-
                     CDIR=$(pwd);
                     taretDir=$CATEGORY/$PROJECT/
                     stlFile=$stl
                     previewFile=$STL-diagonal.jpg
                     cd ../../
-                    bash /opt/render/render-stl.sh $taretDir $stlFile $previewFile $mdFile
+                    bash /opt/render/render-stl.sh $taretDir $stlFile $previewFile
                     cd $CDIR
                 done
+
+                DATE_FILE="thing.date"
+                if [ ! -f $DATE_FILE ];
+                then
+                    echo $DEFAULT_DATE > $DATE_FILE
+                fi
+                MD_FILE="$(cat thing.date)-thing.md"
+                TITLE_FILE="thing.title"
+                DESCR_FILE="thing.descr"
+                DESCRIPTION_FILE="thing.description"
+                
+                if [ ! -f $TITLE_FILE ];
+                then
+                    echo "$PROJECT" > $TITLE_FILE
+                fi
+
+                if [ ! -f $DESCR_FILE ];
+                then
+                    echo "Yet another STL file." > $DESCR_FILE
+                fi
+                
+                rm *-thing.md
+
+                echo "---" > $MD_FILE
+                echo "category: thing" >> $MD_FILE
+                echo "thing_category: $CATEGORY" >> $MD_FILE
+                echo "title: $(tail $TITLE_FILE)" >> $MD_FILE
+                echo "layout: post" >> $MD_FILE
+                echo "description: $(tail $DESCR_FILE)" >> $MD_FILE
+                echo "previewPath: /$CATEGORY/$PROJECT/$previewFile" >> $MD_FILE
+                echo "---" >> $MD_FILE
+                if [ -f $DESCRIPTION_FILE ];
+                then
+                    cat $DESCRIPTION_FILE >> $MD_FILE
+                fi
+
                 cd ..
             fi
         done

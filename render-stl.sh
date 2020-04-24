@@ -3,7 +3,6 @@
 targetDir=$1
 stlFile=$2
 previewFile=$3
-targetMarkdown=$4
 
 PDIR=$(pwd)
 
