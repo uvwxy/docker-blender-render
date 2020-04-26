@@ -36,6 +36,7 @@ for CATEGORY in $(ls | sort -n); do
                         title=\"$STL.stl\" %}" >> $PREVIEWS_FILE
                     cd ../../
                     bash /opt/render/render-stl.sh $taretDir $stlFile $previewFile
+                    previewFile="$STL-diagonal-sm.jpg"
                     cd $CDIR
                 done
 
@@ -79,13 +80,18 @@ for CATEGORY in $(ls | sort -n); do
                 echo "description: $(tail $DESCR_FILE)" >> $MD_FILE
                 echo "previewPath: /things/$CATEGORY/$PROJECT/$(tail $PREVIEW_FILE)" >> $MD_FILE
                 echo "---" >> $MD_FILE
+                cat $DESCR_FILE >> $MD_FILE
+                echo "" >> $MD_FILE
                 echo "#### STL files" >> $MD_FILE
                 cat $PREVIEWS_FILE >> $MD_FILE
+                echo "" >> $MD_FILE
+                echo "#### Description" >> $MD_FILE
+                echo "" >> $MD_FILE
+                cat $DESCRIPTION_FILE >> $MD_FILE
                 echo "#### Source file" >> $MD_FILE
                 echo "[$B.blend](/things/$CATEGORY/$PROJECT/$B.blend)" >> $MD_FILE
-                echo "<br/><br/>You can edit this with Blender. Get Bender here: [https://blender.org](https://blender.org)" >> $MD_FILE
-                echo "#### Description" >> $MD_FILE
-                cat $DESCRIPTION_FILE >> $MD_FILE
+                echo "<br/><br/><small>You can edit this with Blender. You can get it here: [https://blender.org](https://blender.org)</small>" >> $MD_FILE
+                echo "" >> $MD_FILE
                 cd ..
             fi
         done
